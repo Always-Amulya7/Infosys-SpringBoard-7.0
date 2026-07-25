@@ -1,0 +1,33 @@
+# Application Environment Creating
+python -m venv venv
+venv\Scripts\activate
+
+# Site Migrations
+python manage.py makemigrations
+python manage.py migrate
+
+# Super Admin Creations
+python manage.py createsuperuser
+
+# Admin Server Run
+python manage.py runserver 8001
+
+# Running the main app
+uvicorn FastAPI.main:app --reload --port 8000
+
+# Running Celery Worker (required for background jobs)
+celery -A FocusGuard worker --loglevel=info
+
+# Running Celery Beat ( required for scheduled jobs - run in a separate terminal)
+celery -A FocusGuard beat --loglevel=info
+
+# Libraries for activity tracking
+pywin32 psutil
+
+# Superadmin
+User id= Amulya
+Password= 
+
+localStorage.clear();
+document.cookie = "access_token=; path=/; max-age=0";
+location.reload();

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+
+    <title>FocusGuard Login</title>
+  </head>
+
+  <body>
+    <div class="login">
+      <img
+        src="/assets/img/login-bg.png"
+        alt="login image"
+        class="login__img"
+      />
+
+      <form id="loginForm" class="login__form">
+        <h1 class="login__title">Login</h1>
+
+        <div class="login__content">
+          <!-- Username -->
+
+          <div class="login__box">
+            <i class="ri-user-3-line login__icon"></i>
+
+            <div class="login__box-input">
+              <input
+                type="text"
+                id="username"
+                required
+                class="login__input"
+                placeholder=" "
+              />
+
+              <label class="login__label"> Username </label>
+            </div>
+          </div>
+
+          <!-- Password -->
+
+          <div class="login__box">
+            <i class="ri-lock-2-line login__icon"></i>
+
+            <div class="login__box-input">
+              <input
+                type="password"
+                id="password"
+                required
+                class="login__input"
+                placeholder=" "
+              />
+
+              <label class="login__label"> Password </label>
+
+              <i class="ri-eye-off-line login__eye" id="login-eye"> </i>
+            </div>
+          </div>
+        </div>
+
+        <div class="login__check">
+          <div class="login__check-group">
+            <input
+              type="checkbox"
+              class="login__check-input"
+              id="login-check"
+            />
+
+            <label for="login-check" class="login__check-label">
+              Remember me
+            </label>
+          </div>
+
+          <a href="#" class="login__forgot"> Forgot Password? </a>
+        </div>
+
+        <button type="submit" class="login__button">Login</button>
+
+        <p class="login__register">
+          Don't have an account?
+
+          <a href="/register"> Register </a>
+        </p>
+      </form>
+    </div>
+
+    <script src="/assets/js/main.js"></script>
+
+    <script>
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const username = document.getElementById("username").value;
+
+          const password = document.getElementById("password").value;
+
+          try {
+            const response = await fetch("/login", {
+              method: "POST",
+
+              headers: {
+                "Content-Type": "application/json",
+              },
+
+              body: JSON.stringify({
+                username: username,
+
+                password: password,
+              }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              localStorage.setItem("access_token", data.access_token);
+              sessionStorage.setItem("access_token", data.access_token);
+              document.cookie =
+                  "access_token=" + data.access_token + "; path=/; max-age=86400; SameSite=Lax";
+              setTimeout(function() {
+                window.location.href = "/";
+              }, 500);
+            } else {
+              alert(data.detail || "Invalid username or password");
+            }
+          } catch (error) {
+            console.error(error);
+
+            alert("Unable to connect to server");
+          }
+        });
+    </script>
+  </body>
+</html>
+
+
+# Login page for the website frontend part

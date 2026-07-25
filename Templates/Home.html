@@ -1,0 +1,1283 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <title>FocusGuard Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
+      padding-top: 80px;
+      overflow-x: hidden;
+    }
+
+    body::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* ======== NAVBAR ======== */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      width: 100%;
+      padding: 14px 8%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 25px;
+      font-weight: 700;
+    }
+
+    .logo i {
+      font-size: 32px;
+    }
+
+    .logout__button {
+      background: white;
+      color: #0f172a;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 30px;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .logout__button:hover {
+      background: #e2e8f0;
+    }
+
+    /* ======== CONTAINER ======== */
+    .container {
+      padding: 14px 8%;
+    }
+
+    /* ======== PROFILE ======== */
+    .profile {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 13px 25px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .profile h2 {
+      margin-bottom: 4px;
+    }
+
+    .profile p {
+      color: #cbd5e1;
+      font-size: 14px;
+    }
+
+    .profile .status {
+      color: #22c55e;
+    }
+
+    /* ======== MAIN 2-COLUMN DASHBOARD ======== */
+    .main-dashboard {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* ======== LEFT COLUMN ======== */
+    .left-col {
+      min-width: 0;
+      overflow-y: auto;
+      max-height: calc(100vh - 120px);
+      margin-right: 384px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .left-col::-webkit-scrollbar {
+      display: none;
+    }
+
+    .section-title {
+      font-size: 22px;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    /* ======== STATS GRID ======== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    }
+
+    .stat-card i {
+      font-size: 20px;
+      color: #38bdf8;
+      flex-shrink: 0;
+    }
+
+    .stat-card .label {
+      color: #94a3b8;
+      font-size: 10px;
+      font-weight: 500;
+      line-height: 1.2;
+    }
+
+    .stat-card .value {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    /* ======== TABS ======== */
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .tab-btn.active {
+      background: #38bdf8;
+      color: #0f172a;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* ======== SUMMARY TILES ======== */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .summary-dates {
+      margin-bottom: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+
+    .summary-metrics {
+      display: none;
+    }
+
+    #todayMetrics {
+      display: grid !important;
+    }
+
+    .summary-tile {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .summary-tile:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .summary-tile i {
+      font-size: 20px;
+      color: #38bdf8;
+      flex-shrink: 0;
+    }
+
+    .summary-tile .label {
+      color: #94a3b8;
+      font-size: 10px;
+      font-weight: 500;
+      line-height: 1.2;
+    }
+
+    .summary-tile .value {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    /* ======== USAGE INSIGHTS ======== */
+    .usage-insights {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .list-card {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 24px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      max-height: 360px;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .list-card::-webkit-scrollbar {
+      display: none;
+    }
+
+    .list-card h3 {
+      margin-bottom: 14px;
+      font-size: 17px;
+    }
+
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 13px;
+    }
+
+    .list-item:last-child {
+      border-bottom: none;
+    }
+
+    .list-item .domain {
+      color: #e2e8f0;
+    }
+
+    .list-item .duration {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    .badge {
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 6px;
+    }
+
+    .badge-productive {
+      background: rgba(34, 197, 94, 0.2);
+      color: #22c55e;
+    }
+
+    .badge-distraction {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+
+    .activity-item {
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 13px;
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .activity-item .time {
+      color: #94a3b8;
+      font-size: 12px;
+    }
+
+    /* ======== AI CARD ======== */
+    .ai-card {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(99, 102, 241, 0.1));
+      padding: 26px;
+      border-radius: 20px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      margin-bottom: 32px;
+    }
+
+    .ai-card h2 {
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+    }
+
+    .ai-card p,
+    .ai-card li {
+      color: #cbd5e1;
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .ai-card ul {
+      margin-left: 20px;
+      margin-top: 8px;
+    }
+
+    .ai-card .motivational {
+      font-style: italic;
+      color: #38bdf8;
+      margin-top: 14px;
+    }
+
+    /* ======== REPORT BUTTON ======== */
+    .report-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 30px;
+      background: linear-gradient(135deg, #38bdf8, #2563eb);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    .report-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    /* ====================================================
+          RIGHT SIDEBAR — Charts Area
+          ==================================================== */
+    .right-sidebar {
+      position: fixed;
+      top: 100px;
+      right: 8%;
+      width: 360px;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .right-sidebar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .chart-card {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 22px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .chart-card h3 {
+      margin-bottom: 16px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .chart-title-top {
+      text-align: left;
+      margin-bottom: 10px;
+      margin-top: 0;
+    }
+
+    .chart-labels-row {
+      display: flex;
+      justify-content: flex-start;
+      gap: 18px;
+      margin-bottom: 10px;
+    }
+
+    .chart-label {
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s;
+    }
+
+    .chart-label.striked {
+      text-decoration: line-through;
+      opacity: 0.5;
+    }
+
+    .chart-label:hover {
+      opacity: 0.8;
+    }
+
+    .chart-label-productive {
+      color: #22c55e;
+    }
+
+    .chart-label-distraction {
+      color: #ef4444;
+    }
+
+    .chart-label-idle {
+      color: #94a3b8;
+    }
+
+    .today-chart-wrap {
+      max-width: 180px;
+      margin: 0 auto;
+      height: 180px;
+    }
+
+    .weekly-chart-wrap {
+      height: 220px;
+    }
+
+    /* ======== FOOTER ======== */
+    .footer {
+      text-align: center;
+      padding: 8px;
+      color: #94a3b8;
+      margin-top: 4px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* ======== RESPONSIVE ======== */
+    @media (max-width: 1024px) {
+      .main-dashboard {
+        grid-template-columns: 1fr;
+      }
+
+      .left-col {
+        margin-right: 0;
+        max-height: none;
+      }
+
+      .right-sidebar {
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+        max-height: none;
+        overflow-y: visible;
+        width: auto;
+        top: auto;
+        right: auto;
+      }
+
+      .right-sidebar .chart-card {
+        flex: 1 1 320px;
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+
+      .navbar,
+      .container {
+        padding: 20px 5%;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .profile {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ===================== NAVBAR ===================== -->
+  <header class="navbar">
+    <div class="logo">
+      <i class="ri-shield-check-line"></i>
+      FocusGuard
+    </div>
+    <form id="logoutForm">
+      <button type="submit" class="logout__button">Logout</button>
+    </form>
+  </header>
+
+  <section class="container">
+    <!-- =================== PROFILE =================== -->
+    <!-- moved inside left-col so width matches tiles below -->
+
+    <!-- ============ MAIN DASHBOARD (2-column) ============ -->
+    <div class="main-dashboard">
+
+      <!-- =============== LEFT COLUMN =============== -->
+      <div class="left-col">
+        <!-- Profile -->
+        <div class="profile" style="margin-top:6px;">
+          <div>
+            <h2>Welcome, {{ username }}</h2>
+            <p>Organization: <strong>{{ organization }}</strong></p>
+          </div>
+           <div>
+             <p>Status: <span class="status"> Monitoring Active </span></p>
+             <p id="lastUpdated" style="color: #94a3b8; font-size: 12px; margin-top: 5px;">Loading...</p>
+           </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <i class="ri-time-line"></i>
+            <div>
+              <div class="label">Working Time</div>
+              <div class="value" id="workingTime">--</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <i class="ri-cup-line"></i>
+            <div>
+              <div class="label">Idle Time</div>
+              <div class="value" id="idleTime">--</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <i class="ri-close-circle-line"></i>
+            <div>
+              <div class="label">Distraction Time</div>
+              <div class="value" id="distractionTime">--</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <i class="ri-bar-chart-line"></i>
+            <div>
+              <div class="label">Productivity Score</div>
+              <div class="value" id="productivityScore">--</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <i class="ri-focus-3-line"></i>
+            <div>
+              <div class="label">Focus Score</div>
+              <div class="value" id="focusScore">--</div>
+            </div>
+          </div>
+        </div>
+
+        <button id="refreshBtn" onclick="refreshNow()"
+          style="margin-bottom:18px; padding:8px 16px; border-radius:10px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.08); color:white; cursor:pointer; font-size:13px;">
+          <i class="ri-refresh-line"></i> Refresh Now
+        </button>
+
+        <!-- Tabs -->
+        <h2 class="section-title">Summaries</h2>
+        <div class="tabs">
+          <button class="tab-btn active" onclick="showTab(this, 'today')">Today</button>
+          <button class="tab-btn" onclick="showTab(this, 'week')">Weekly</button>
+          <button class="tab-btn" onclick="showTab(this, 'month')">Monthly</button>
+        </div>
+        <div id="tab-today" class="tab-content active">
+          <div class="summary-grid summary-metrics" id="todayMetrics"></div>
+        </div>
+        <div id="tab-week" class="tab-content">
+          <div class="summary-grid summary-dates" id="weekDates"></div>
+          <div class="summary-grid summary-metrics" id="weekMetrics"></div>
+        </div>
+        <div id="tab-month" class="tab-content">
+          <div class="summary-grid summary-dates" id="monthDates"></div>
+          <div class="summary-grid summary-metrics" id="monthMetrics"></div>
+        </div>
+
+        <!-- Usage Insights -->
+        <div class="usage-insights">
+          <div class="list-card">
+            <h3>Most Used Websites</h3>
+            <div id="mostUsedWebsites"></div>
+          </div>
+          <div class="list-card">
+            <h3>Recent Activities</h3>
+            <div id="recentActivities"></div>
+          </div>
+        </div>
+
+        <!-- AI Summary -->
+        <div class="ai-card">
+          <h2><i class="ri-brain-line"></i> AI Summary</h2>
+          <div id="aiSummary">
+            <p>Loading AI insights&hellip;</p>
+          </div>
+        </div>
+
+        <!-- Generate Report Button -->
+        <div style="text-align: left;">
+          <button class="report-btn" onclick="generateReport()">
+            <i class="ri-file-download-line"></i> Generate Report
+          </button>
+        </div>
+
+      </div><!-- /left-col -->
+
+      <!-- =============== RIGHT SIDEBAR =============== -->
+      <div class="right-sidebar">
+
+        <!-- Weekly Chart -->
+        <div class="chart-card">
+          <h3>Weekly Overview</h3>
+          <div class="weekly-chart-wrap">
+            <canvas id="weeklyChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Today Chart -->
+        <div class="chart-card">
+          <h3 class="chart-title-top">Today&apos;s Breakdown</h3>
+          <div class="chart-labels-row">
+            <span class="chart-label chart-label-productive">Productive</span>
+            <span class="chart-label chart-label-distraction">Distraction</span>
+            <span class="chart-label chart-label-idle">Idle</span>
+          </div>
+          <div class="today-chart-wrap">
+            <canvas id="todayChart"></canvas>
+          </div>
+        </div>
+
+      </div><!-- /right-sidebar -->
+
+    </div><!-- /main-dashboard -->
+
+  </section><!-- /container -->
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    &copy; 2026 FocusGuard AI | Human Attention Preservation Platform
+  </footer>
+
+  <!-- ===================== SCRIPTS ===================== -->
+  <script>
+    const API_BASE = "http://127.0.0.1:8000";
+
+    function logDash(...args) {
+      if (console && console.log) console.log("[FocusGuard Dash]", ...args);
+    }
+
+    (function requireAuth() {
+      const token = (function () {
+        const cookies = document.cookie.split(";");
+        for (const cookie of cookies) {
+          const eq = cookie.indexOf("=");
+          if (eq > -1) {
+            const name = cookie.trim().slice(0, eq);
+            if (name === "access_token") return cookie.trim().slice(eq + 1);
+          }
+        }
+        return localStorage.getItem("access_token");
+      })();
+      if (!token) {
+        window.location.href = "/";
+      }
+    })();
+
+    function getToken() {
+      const cookies = document.cookie.split(";");
+      for (const cookie of cookies) {
+        const eq = cookie.indexOf("=");
+        if (eq > -1) {
+          const name = cookie.trim().slice(0, eq);
+          if (name === "access_token") return cookie.trim().slice(eq + 1);
+        }
+      }
+      return localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
+    }
+
+    function authHeaders() {
+      const token = getToken();
+      return token ? { Authorization: "Bearer " + token } : {};
+    }
+
+    async function apiGet(path) {
+      logDash("GET", API_BASE + path);
+      const res = await fetch(API_BASE + path, { headers: { ...authHeaders() } });
+      logDash("GET status", res.status, res.statusText);
+      if (res.status === 401) {
+        logDash("GET 401 Unauthorized - stopping refresh");
+        return null;
+      }
+      if (!res.ok) {
+        const txt = await res.text();
+        logDash("GET failed", txt);
+        throw new Error("Failed: " + res.status);
+      }
+      const json = await res.json();
+      logDash("GET data", path, JSON.stringify(json).slice(0, 500));
+      return json;
+    }
+
+    function formatDuration(seconds) {
+      if (!seconds) return "0m";
+      const h = Math.floor(seconds / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+      if (h > 0) return h + "h " + m + "m";
+      return m + "m";
+    }
+
+    function showTab(btn, tab) {
+      document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+      document.querySelectorAll(".tab-content").forEach((c) => c.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("tab-" + tab).classList.add("active");
+      if (tab === "today") { loadTodayAnalytics(); }
+      if (tab === "week") { loadWeekAnalytics(); loadWeekSummary(); }
+      if (tab === "month") { loadMonthAnalytics(); loadMonthSummary(); }
+    }
+
+    async function loadTodayAnalytics() {
+      logDash("loadTodayAnalytics start");
+      try {
+        const data = await apiGet("/api/analytics/today");
+        if (!data) {
+          logDash("loadTodayAnalytics no data");
+          return;
+        }
+        document.getElementById("workingTime").innerText = formatDuration(data.active_time);
+        document.getElementById("idleTime").innerText = formatDuration(data.idle_time);
+        document.getElementById("distractionTime").innerText = formatDuration(data.distraction_time);
+        document.getElementById("productivityScore").innerText = data.productivity_score + "%";
+        document.getElementById("focusScore").innerText = data.focus_score + "%";
+        document.getElementById("lastUpdated").innerText = "Updated: " + new Date().toLocaleTimeString();
+
+        const metricsHtml = `
+          <div class="summary-tile">
+            <i class="ri-time-line"></i>
+            <div>
+              <div class="label">Total Time</div>
+              <div class="value">${formatDuration(data.total_time)}</div>
+            </div>
+          </div>
+          <div class="summary-tile">
+            <i class="ri-pulse-line"></i>
+            <div>
+              <div class="label">Active Time</div>
+              <div class="value">${formatDuration(data.active_time)}</div>
+            </div>
+          </div>
+          <div class="summary-tile">
+            <i class="ri-cup-line"></i>
+            <div>
+              <div class="label">Idle Time</div>
+              <div class="value">${formatDuration(data.idle_time)}</div>
+            </div>
+          </div>
+          <div class="summary-tile">
+            <i class="ri-checkbox-circle-line"></i>
+            <div>
+              <div class="label">Productive Time</div>
+              <div class="value">${formatDuration(data.productive_time)}</div>
+            </div>
+          </div>
+          <div class="summary-tile">
+            <i class="ri-close-circle-line"></i>
+            <div>
+              <div class="label">Distraction Time</div>
+              <div class="value">${formatDuration(data.distraction_time)}</div>
+            </div>
+          </div>
+          <div class="summary-tile">
+            <i class="ri-focus-3-line"></i>
+            <div>
+              <div class="label">Focus Score</div>
+              <div class="value">${data.focus_score}%</div>
+            </div>
+          </div>
+        `;
+        document.getElementById("todayMetrics").innerHTML = metricsHtml;
+
+        const websitesEl = document.getElementById("mostUsedWebsites");
+        if (data.most_used_websites && data.most_used_websites.length) {
+          websitesEl.innerHTML = data.most_used_websites.slice(0, 10).map((w) => {
+            const cap = (w.classification || '').charAt(0).toUpperCase() + (w.classification || '').slice(1);
+            return `
+            <div class="list-item">
+              <span class="domain">${w.domain} <span class="badge ${w.classification === 'distraction' ? 'badge-distraction' : 'badge-productive'}">${cap}</span></span>
+              <span class="duration">${formatDuration(w.duration)}</span>
+            </div>
+          `;
+          }).join("");
+        } else {
+          websitesEl.innerHTML = "<p style='color:#94a3b8;'>No data yet. Start browsing!</p>";
+        }
+
+        const actEl = document.getElementById("recentActivities");
+        if (data.recent_activities && data.recent_activities.length) {
+          actEl.innerHTML = data.recent_activities.slice(0, 10).map((a) => `
+            <div class="activity-item">
+              <div><strong>${a.domain || 'Unknown'}</strong> - ${a.title || ''}</div>
+              <div class="time">${a.event_type} | ${formatDuration(a.duration)}</div>
+            </div>
+          `).join("");
+        } else {
+          actEl.innerHTML = "<p style='color:#94a3b8;'>No recent activities.</p>";
+        }
+
+        const productive = data.productive_time || 0;
+        const distraction = data.distraction_time || 0;
+        const idle = data.idle_time || 0;
+        const labels = ["Productive", "Distraction", "Idle"];
+        const values = [productive, distraction, idle];
+        const colors = ["#22c55e", "#ef4444", "#94a3b8"];
+        window._todayChartValues = values;
+        window._todayChartLabels = labels;
+        window._todayChartColors = colors;
+        window._todayChartActive = -1;
+
+        function renderTodayChart() {
+          const active = window._todayChartActive;
+          const bgColors = active === -1
+            ? window._todayChartColors
+            : window._todayChartColors.map((c, i) => i === active ? c : c + '66');
+          const borderColors = active === -1
+            ? 'transparent'
+            : window._todayChartColors.map((_, i) => i === active ? '#fff' : 'transparent');
+          const borderWidths = active === -1
+            ? 0
+            : window._todayChartColors.map((_, i) => i === active ? 2 : 0);
+
+          if (window.todayChartInstance) window.todayChartInstance.destroy();
+          window.todayChartInstance = new Chart(document.getElementById("todayChart"), {
+            type: "doughnut",
+            data: { labels: window._todayChartLabels, datasets: [{ data: window._todayChartValues, backgroundColor: bgColors, borderColor: borderColors, borderWidth: borderWidths, borderRadius: 4 }] },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              cutout: "68%",
+              layout: { padding: 8 },
+              plugins: {
+                legend: { display: false }
+              }
+            },
+          });
+        }
+
+        renderTodayChart();
+
+        document.querySelectorAll('.chart-label').forEach((el, idx) => {
+          el.addEventListener('click', () => {
+            if (window._todayChartActive === idx) {
+              window._todayChartActive = -1;
+              el.classList.remove('striked');
+            } else {
+              document.querySelectorAll('.chart-label').forEach(l => l.classList.remove('striked'));
+              window._todayChartActive = idx;
+              el.classList.add('striked');
+            }
+            renderTodayChart();
+          });
+        });
+      } catch (e) {
+        logDash("loadTodayAnalytics error", e);
+      }
+    }
+
+    async function loadWeekAnalytics() {
+      logDash("loadWeekAnalytics start");
+      try {
+        const data = await apiGet("/api/analytics/week");
+        if (!data) return;
+        const labels = data.week.map((d) => new Date(d.date).toLocaleDateString(undefined, { weekday: "short" }));
+        const total = data.week.map((d) => Math.round(d.total_time / 60));
+        if (window.weeklyChartInstance) window.weeklyChartInstance.destroy();
+        window.weeklyChartInstance = new Chart(document.getElementById("weeklyChart"), {
+          type: "line",
+          data: {
+            labels,
+            datasets: [
+              { data: total, borderColor: "#38bdf8", backgroundColor: "rgba(56,189,248,0.15)", borderWidth: 3, tension: 0.35, fill: true, pointBackgroundColor: "#38bdf8", pointBorderColor: "#fff", pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 7 },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: { ticks: { color: "rgba(255,255,255,0.7)", font: { size: 11, family: "Segoe UI" } }, grid: { color: "rgba(255,255,255,0.06)" } },
+              y: { ticks: { color: "rgba(255,255,255,0.7)", font: { size: 11, family: "Segoe UI" } }, grid: { color: "rgba(255,255,255,0.06)" }, beginAtZero: true },
+            },
+            plugins: { legend: { display: false }, tooltip: { backgroundColor: "rgba(15,23,42,0.9)", titleColor: "#fff", bodyColor: "#cbd5e1", borderColor: "rgba(56,189,248,0.3)", borderWidth: 1, padding: 10, cornerRadius: 8, titleFont: { family: "Segoe UI" }, bodyFont: { family: "Segoe UI" } } },
+            interaction: { intersect: false, mode: "index" },
+          },
+        });
+      } catch (e) {
+        logDash("loadWeekAnalytics error", e);
+      }
+    }
+
+    async function loadWeekSummary() {
+      logDash("loadWeekSummary start");
+      try {
+        const data = await apiGet("/api/analytics/week");
+        if (!data) return;
+        const datesEl = document.getElementById("weekDates");
+        const metricsEl = document.getElementById("weekMetrics");
+
+        datesEl.innerHTML = data.week.map((d, idx) => `
+            <div class="summary-tile" data-idx="${idx}" style="cursor:pointer;">
+              <i class="ri-calendar-line"></i>
+              <div>
+                <div class="label">${new Date(d.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+                <div class="value">${formatDuration(d.total_time)}</div>
+              </div>
+            </div>
+          `).join("");
+
+        metricsEl.innerHTML = "";
+        metricsEl.style.display = "none";
+
+        datesEl.querySelectorAll(".summary-tile").forEach((tile) => {
+          tile.addEventListener("click", () => {
+            const idx = parseInt(tile.getAttribute("data-idx"), 10);
+            const d = data.week[idx];
+            metricsEl.innerHTML = `
+              <div class="summary-tile">
+                <i class="ri-time-line"></i>
+                <div>
+                  <div class="label">Total Time</div>
+                  <div class="value">${formatDuration(d.total_time)}</div>
+                </div>
+              </div>
+              <div class="summary-tile">
+                <i class="ri-pulse-line"></i>
+                <div>
+                  <div class="label">Active Time</div>
+                  <div class="value">${formatDuration(d.active_time || 0)}</div>
+                </div>
+              </div>
+              <div class="summary-tile">
+                <i class="ri-cup-line"></i>
+                <div>
+                  <div class="label">Idle Time</div>
+                  <div class="value">${formatDuration(d.idle_time || 0)}</div>
+                </div>
+              </div>
+              <div class="summary-tile">
+                <i class="ri-checkbox-circle-line"></i>
+                <div>
+                  <div class="label">Productive Time</div>
+                  <div class="value">${formatDuration(d.productive_time || 0)}</div>
+                </div>
+              </div>
+              <div class="summary-tile">
+                <i class="ri-close-circle-line"></i>
+                <div>
+                  <div class="label">Distraction Time</div>
+                  <div class="value">${formatDuration(d.distraction_time || 0)}</div>
+                </div>
+              </div>
+              <div class="summary-tile">
+                <i class="ri-focus-3-line"></i>
+                <div>
+                  <div class="label">Focus Score</div>
+                  <div class="value">${d.focus_score || 0}%</div>
+                </div>
+              </div>
+            `;
+            metricsEl.style.display = "grid";
+          });
+        });
+      } catch (e) {
+        logDash("loadWeekSummary error", e);
+      }
+    }
+
+    async function loadMonthAnalytics() {
+      logDash("loadMonthAnalytics start");
+      try {
+        const data = await apiGet("/api/analytics/month");
+        if (!data) return;
+        if (window.monthlyChartInstance) window.monthlyChartInstance.destroy();
+        const labels = data.month.map((d) => new Date(d.date).getDate());
+        const productive = data.month.map((d) => Math.round(d.productive_time / 60));
+        window.monthlyChartInstance = new Chart(document.getElementById("weeklyChart"), {
+          type: "line",
+          data: {
+            labels,
+            datasets: [
+              { label: "Productive (min)", data: productive, borderColor: "#22c55e", backgroundColor: "rgba(34,197,94,0.1)", borderWidth: 3, tension: 0.35, fill: true, pointBackgroundColor: "#22c55e", pointBorderColor: "#fff", pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 7 },
+              { label: "Focus Score", data: data.month.map((d) => d.focus_score), borderColor: "#38bdf8", backgroundColor: "rgba(56,189,248,0.1)", borderWidth: 3, tension: 0.35, fill: true, pointBackgroundColor: "#38bdf8", pointBorderColor: "#fff", pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 7 },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: { ticks: { color: "rgba(255,255,255,0.7)", font: { size: 11, family: "Segoe UI" } }, grid: { color: "rgba(255,255,255,0.06)" } },
+              y: { ticks: { color: "rgba(255,255,255,0.7)", font: { size: 11, family: "Segoe UI" } }, grid: { color: "rgba(255,255,255,0.06)" }, beginAtZero: true },
+            },
+            plugins: { legend: { labels: { color: "white", font: { family: "Segoe UI" }, boxWidth: 10, padding: 10, usePointStyle: true, pointStyleWidth: 8 } }, tooltip: { backgroundColor: "rgba(15,23,42,0.9)", titleColor: "#fff", bodyColor: "#cbd5e1", borderColor: "rgba(56,189,248,0.3)", borderWidth: 1, padding: 10, cornerRadius: 8, titleFont: { family: "Segoe UI" }, bodyFont: { family: "Segoe UI" } } },
+            interaction: { intersect: false, mode: "index" },
+          },
+        });
+      } catch (e) {
+        logDash("loadMonthAnalytics error", e);
+      }
+    }
+
+    async function loadMonthSummary() {
+      logDash("loadMonthSummary start");
+      try {
+        const data = await apiGet("/api/analytics/month");
+        if (!data) return;
+        const datesEl = document.getElementById("monthDates");
+        const metricsEl = document.getElementById("monthMetrics");
+
+        datesEl.innerHTML = data.month.map((d, idx) => `
+            <div class="summary-tile" data-idx="${idx}" style="cursor:pointer;">
+              <i class="ri-calendar-line"></i>
+              <div>
+                <div class="label">${new Date(d.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+                <div class="value">${formatDuration(d.total_time)}</div>
+              </div>
+            </div>
+          `).join("");
+
+        metricsEl.innerHTML = "";
+        metricsEl.style.display = "none";
+
+        datesEl.querySelectorAll(".summary-tile").forEach((tile) => {
+          tile.addEventListener("click", () => {
+            const idx = parseInt(tile.getAttribute("data-idx"), 10);
+            const d = data.month[idx];
+            metricsEl.innerHTML = `
+              <div class="summary-tile">
+                <i class="ri-time-line"></i>
+                <div>
+                  <div class="label">Total Time</div>
+                  <div class="value">${formatDuration(d.total_time)}</div>
+                </div>
+              </div>
+              <div class="summary-tile">
+                <i class="ri-pulse-line"></i>
+                <div>
+                  <div class="label">Active Time</div>
+                  <div class="value">${formatDuration(d.active_time || 0)}</div>
+                </div>
+              </div>
+              <div class="summary-tile">
+                <i class="ri-cup-line"></i>
+                <div>
+                  <div class="label">Idle Time</div>
+                  <div class="value">${formatDuration(d.idle_time || 0)}</div>
+                </div>
+              </div>
+              <div class="summary-tile">
+                <i class="ri-checkbox-circle-line"></i>
+                <div>
+                  <div class="label">Productive Time</div>
+                  <div class="value">${formatDuration(d.productive_time || 0)}</div>
+                </div>
+              </div>
+              <div class="summary-tile">
+                <i class="ri-close-circle-line"></i>
+                <div>
+                  <div class="label">Distraction Time</div>
+                  <div class="value">${formatDuration(d.distraction_time || 0)}</div>
+                </div>
+              </div>
+              <div class="summary-tile">
+                <i class="ri-focus-3-line"></i>
+                <div>
+                  <div class="label">Focus Score</div>
+                  <div class="value">${d.focus_score || 0}%</div>
+                </div>
+              </div>
+            `;
+            metricsEl.style.display = "grid";
+          });
+        });
+      } catch (e) {
+        logDash("loadMonthSummary error", e);
+      }
+    }
+
+    async function loadAISummary() {
+      logDash("loadAISummary start");
+      try {
+        const data = await apiGet("/api/summary/today");
+        if (!data) return;
+        const el = document.getElementById("aiSummary");
+        el.innerHTML = `
+            <p><strong>Summary:</strong> ${data.summary}</p>
+            <p><strong>Analysis:</strong> ${data.productivity_analysis}</p>
+            <p><strong>Most distracting websites:</strong> ${data.most_distracting_websites.join(", ") || "None today"}</p>
+            <p><strong>Most productive applications:</strong> ${data.most_productive_applications.join(", ") || "None today"}</p>
+            <p><strong>Areas of improvement:</strong></p>
+            <ul>${data.areas_of_improvement.map((a) => `<li>${a}</li>`).join("")}</ul>
+            <p><strong>Recommendations:</strong></p>
+            <ul>${data.recommendations.map((r) => `<li>${r}</li>`).join("")}</ul>
+            <p><strong>Focus Score Explanation:</strong> ${data.focus_score_explanation}</p>
+            <p class="motivational"><i class="ri-lightbulb-line"></i> ${data.motivational_message}</p>
+          `;
+      } catch (e) {
+        document.getElementById("aiSummary").innerHTML = "<p>AI summary unavailable right now.</p>";
+      }
+    }
+
+    async function generateReport() {
+      const type = prompt("Report type (daily/weekly/monthly):", "daily").toLowerCase();
+      const format = prompt("Format (json/csv):", "json").toLowerCase();
+      if (!type || !format || (format !== "json" && format !== "csv")) {
+        alert("Invalid type or format. Use daily/weekly/monthly and json/csv.");
+        return;
+      }
+      let data = null;
+      try {
+        if (type === "daily") data = await apiGet("/api/analytics/today");
+        else if (type === "weekly") data = await apiGet("/api/analytics/week");
+        else if (type === "monthly") data = await apiGet("/api/analytics/month");
+        else { alert("Invalid report type"); return; }
+      } catch (e) {
+        alert("Failed to load data for report");
+        return;
+      }
+      if (!data) return;
+      let content = "";
+      let mime = "text/plain";
+      if (format === "json") {
+        content = JSON.stringify(data, null, 2);
+        mime = "application/json";
+      } else if (format === "csv") {
+        const rows = [["Domain", "Duration", "Active Duration", "Classification"]];
+        const sites = data.websites || data.most_used_websites || [];
+        sites.forEach((w) => rows.push([w.domain, w.duration, w.active_duration, w.classification]));
+        content = rows.map((r) => r.join(",")).join("\n");
+        mime = "text/csv";
+      }
+      const blob = new Blob([content], { type: mime });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `focusguard-${type}-report-${Date.now()}.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    document.getElementById("logoutForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const token = getToken();
+      try {
+        await fetch(API_BASE + "/logout", {
+          method: "POST",
+          headers: { Authorization: "Bearer " + token },
+        });
+      } catch (err) {
+        logDash("logout error", err);
+      } finally {
+        localStorage.removeItem("access_token");
+        sessionStorage.removeItem("access_token");
+        document.cookie = "access_token=; path=/; max-age=0";
+        window.location.href = "/";
+      }
+    });
+
+    (async () => {
+      logDash("Dashboard initializing");
+      try {
+        await loadTodayAnalytics();
+        await loadWeekAnalytics();
+        await loadAISummary();
+      } catch (e) {
+        logDash("Dashboard init error", e);
+      }
+      setInterval(async () => {
+        try {
+          logDash("Auto refresh start");
+          await loadTodayAnalytics();
+          await loadWeekAnalytics();
+          await loadAISummary();
+          logDash("Auto refresh done");
+        } catch (e) {
+          logDash("Auto refresh error", e);
+        }
+      }, 10000);
+    })();
+
+    async function refreshNow() {
+      const btn = document.getElementById("refreshBtn");
+      if (btn) {
+        btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Refreshing...';
+        btn.disabled = true;
+      }
+      try {
+        logDash("Manual refresh start");
+        await loadTodayAnalytics();
+        await loadWeekAnalytics();
+        await loadAISummary();
+        logDash("Manual refresh done");
+      } catch (e) {
+        logDash("Manual refresh error", e);
+      } finally {
+        if (btn) {
+          btn.innerHTML = '<i class="ri-refresh-line"></i> Refresh Now';
+          btn.disabled = false;
+        }
+      }
+    }
+  </script>
+</body>
+
+</html>

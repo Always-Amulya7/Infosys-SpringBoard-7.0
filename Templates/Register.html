@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+
+    <title>FocusGuard Registration</title>
+  </head>
+
+  <body>
+    <div class="login">
+      <img
+        src="/assets/img/login-bg.png"
+        alt="register image"
+        class="login__img"
+      />
+
+      <form id="registerForm" class="login__form">
+        <h1 class="login__title">Register</h1>
+
+        <div class="login__content">
+          <!-- Username -->
+
+          <div class="login__box">
+            <i class="ri-user-3-line login__icon"></i>
+
+            <div class="login__box-input">
+              <input
+                type="text"
+                id="username"
+                required
+                class="login__input"
+                placeholder=" "
+              />
+
+              <label class="login__label"> Username </label>
+            </div>
+          </div>
+
+          <!-- Email -->
+
+          <div class="login__box">
+            <i class="ri-mail-line login__icon"></i>
+
+            <div class="login__box-input">
+              <input
+                type="email"
+                id="email"
+                required
+                class="login__input"
+                placeholder=" "
+              />
+
+              <label class="login__label"> Email </label>
+            </div>
+          </div>
+
+          <!-- Password -->
+
+          <div class="login__box">
+            <i class="ri-lock-2-line login__icon"></i>
+
+            <div class="login__box-input">
+              <input
+                type="password"
+                id="password"
+                required
+                class="login__input"
+                placeholder=" "
+              />
+
+              <label class="login__label"> Password </label>
+
+              <i class="ri-eye-off-line login__eye" id="register-eye"> </i>
+            </div>
+          </div>
+
+          <!-- Organization -->
+
+          <div class="login__box">
+            <i class="ri-building-line login__icon"></i>
+
+            <div class="login__box-input">
+              <input
+                type="text"
+                id="organization"
+                required
+                class="login__input"
+                placeholder=" "
+              />
+
+              <label class="login__label"> Organization </label>
+            </div>
+          </div>
+
+          <!-- Department -->
+
+          <div class="login__box">
+            <i class="ri-team-line login__icon"></i>
+
+            <div class="login__box-input">
+              <select id="department" required class="login__input">
+                <option value="">Select Department</option>
+
+                <option value="Technical">Technical</option>
+
+                <option value="Managerial">Managerial</option>
+
+                <option value="Operational">Operational</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="login__button">Register</button>
+
+        <p class="login__register">
+          Already have an account?
+
+          <a href="/login"> Login </a>
+        </p>
+      </form>
+    </div>
+
+    <script src="/assets/js/main.js"></script>
+
+    <script>
+      document
+
+        .getElementById("registerForm")
+
+        .addEventListener(
+          "submit",
+
+          async function (event) {
+            event.preventDefault();
+
+            const username = document.getElementById("username").value;
+
+            const email = document.getElementById("email").value;
+
+            const password = document.getElementById("password").value;
+
+            const organization = document.getElementById("organization").value;
+
+            const department = document.getElementById("department").value;
+
+            try {
+              const response = await fetch(
+                "/register",
+
+                {
+                  method: "POST",
+
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+
+                  body: JSON.stringify({
+                    username: username,
+
+                    email: email,
+
+                    password: password,
+
+                    organization: organization,
+
+                    department: department,
+                  }),
+                },
+              );
+
+              const data = await response.json();
+
+              if (response.ok) {
+                 alert("Registration successful");
+
+                 window.location.href = "/";
+              } else {
+                alert(data.detail || "Registration failed");
+              }
+            } catch (error) {
+              console.error(error);
+
+              alert("Unable to connect to server");
+            }
+          },
+        );
+    </script>
+  </body>
+</html>
+
+# As we have the login page in the same way the register page where the registeration works.
+
+# Login, Register and Home page was taken from open source project available and just connected here in this app.

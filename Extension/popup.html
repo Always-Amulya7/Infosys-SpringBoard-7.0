@@ -1,0 +1,417 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>FocusGuard</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    body {
+      width: 300px;
+      min-height: 330px;
+      padding: 16px;
+      background: linear-gradient(135deg, #0f172a, #020617);
+      color: white;
+      overflow: hidden;
+    }
+
+    /* LOGIN */
+
+    #login {
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 36px;
+      margin-bottom: 8px;
+    }
+
+    #login h2 {
+      color: #38bdf8;
+      margin-bottom: 18px;
+    }
+
+    input[type=text],
+    input[type=password] {
+      width: 100%;
+      padding: 11px;
+      margin-bottom: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #1e293b;
+      color: white;
+      outline: none;
+    }
+
+    #loginBtn {
+      width: 100%;
+      padding: 11px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    #message {
+      margin-top: 10px;
+      color: #ef4444;
+      font-size: 13px;
+    }
+
+    /* DASHBOARD */
+
+    #dashboard {
+      display: none;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand span {
+      font-size: 20px;
+    }
+
+    .brand h2 {
+      font-size: 17px;
+      color: #38bdf8;
+      font-weight: 600;
+      letter-spacing: .3px;
+    }
+
+    .connection {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #22c55e;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 8px #22c55e;
+    }
+
+    .info {
+      margin-bottom: 14px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    .label {
+      color: #94a3b8;
+      font-size: 13px;
+      min-width: 90px;
+    }
+
+    .value {
+      color: white;
+      font-size: 13px;
+      text-align: right;
+      max-width: 165px;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      white-space: normal;
+    }
+
+    /* ALERT BOX */
+
+    .alertBox {
+      background: rgba(30, 41, 59, .8);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    /* Title + Enable Alerts on same line */
+
+    .alertHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .alertTitle {
+      color: #38bdf8;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .enableLabel {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: #cbd5e1;
+      cursor: pointer;
+    }
+
+    .enableLabel input[type=checkbox] {
+      transform: scale(.9);
+    }
+
+    .alertRow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .alertRow:last-child {
+      margin-bottom: 0;
+    }
+
+    .alertRow label {
+      font-size: 12px;
+      color: #cbd5e1;
+    }
+
+    /* Underline input instead of dark box */
+
+    /* Underline input instead of dark box */
+
+    .alertRow input[type=number] {
+      width: 42px;
+      padding: 2px 0;
+      border: none;
+      border-bottom: 1px solid #94a3b8;
+      background: transparent;
+      color: white;
+      text-align: center;
+      outline: none;
+      font-size: 13px;
+
+      /* Remove spinner in Firefox */
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+
+    /* Remove spinner buttons in Chrome, Edge & Safari */
+
+    .alertRow input[type=number]::-webkit-inner-spin-button,
+    .alertRow input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .alertRow input[type=number]:focus {
+      border-bottom-color: #38bdf8;
+    }
+
+    .alertRow input[type=number]:focus {
+      border-bottom-color: #38bdf8;
+    }
+
+    .unit {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-left: 4px;
+    }
+
+    /* BUTTONS */
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .buttons button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    #saveNotifBtn {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: white;
+    }
+
+    #logoutBtn {
+      background: linear-gradient(135deg, #dc2626, #991b1b);
+      color: white;
+    }
+
+    #notifMessage {
+      display: none;
+      text-align: center;
+      color: #22c55e;
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    .footer {
+      margin-top: 14px;
+      text-align: center;
+      color: #64748b;
+      font-size: 11px;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <!-- LOGIN -->
+
+  <div id="login">
+
+    <div class="logo">🛡️</div>
+
+    <h2>FocusGuard</h2>
+
+    <input type="text" id="username" placeholder="Username">
+
+    <input type="password" id="password" placeholder="Password">
+
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+      <input type="checkbox" id="rememberMe" checked style="width:auto;">
+      <label for="rememberMe" style="font-size:12px; color:#cbd5e1; cursor:pointer;">Keep me logged in</label>
+    </div>
+
+    <button id="loginBtn">Login</button>
+
+    <p id="message"></p>
+
+  </div>
+
+  <!-- DASHBOARD -->
+
+  <div id="dashboard">
+
+    <div class="header">
+
+      <div class="brand">
+        <span>🛡️</span>
+        <h2>FocusGuard</h2>
+      </div>
+
+      <div class="connection">
+        <div class="dot"></div>
+        <span id="status">Connected</span>
+      </div>
+
+    </div>
+
+    <div class="info">
+
+      <div class="row">
+        <div class="label">User</div>
+        <div class="value" id="currentUser">Amulya</div>
+      </div>
+
+      <div class="row">
+        <div class="label">Current Website</div>
+        <div class="value" id="website">Loading...</div>
+      </div>
+
+      <div class="row">
+        <div class="label">Focus Time</div>
+        <div class="value" id="focusTime">0 sec</div>
+      </div>
+
+    </div>
+
+    <!-- Distraction Alerts -->
+
+    <div class="alertBox">
+
+      <div class="alertHeader">
+
+        <div class="alertTitle">
+          Distraction Alerts
+        </div>
+
+        <label class="enableLabel">
+          <input type="checkbox" id="notificationsEnabled" checked>
+          Enable Alerts
+        </label>
+
+      </div>
+
+      <div class="alertRow">
+
+        <label>Threshold</label>
+
+        <div>
+          <input type="number" id="notificationThreshold" value="20" min="1">
+
+          <span class="unit">min</span>
+        </div>
+
+      </div>
+
+      <div class="alertRow">
+
+        <label>Cooldown</label>
+
+        <div>
+          <input type="number" id="notificationCooldown" value="15" min="1">
+
+          <span class="unit">min</span>
+        </div>
+
+      </div>
+
+      <p id="notifMessage">
+        Settings Saved
+      </p>
+
+    </div>
+
+    <div class="buttons">
+
+      <button id="saveNotifBtn">
+        Save
+      </button>
+
+      <button id="logoutBtn">
+        Logout
+      </button>
+
+    </div>
+
+    <div class="footer">
+      FocusGuard Productivity Monitor
+    </div>
+
+  </div>
+
+  <script src="popup.js"></script>
+
+</body>
+
+</html>
